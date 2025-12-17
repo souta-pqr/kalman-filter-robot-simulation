@@ -80,13 +80,41 @@ def plot_with_estimates(true_positions, observations, estimates, save_path=None)
     plt.figure(figsize=(10, 6))
     plt.plot(steps, true_positions, 'g-', label='True Position', linewidth=2)
     plt.plot(steps, observations, 'rx', label='Observations', markersize=8, alpha=0.5)
-    plt.plot(steps, estimates, 'b-', label='Estimates (Average)', linewidth=2)
+    plt.plot(steps, estimates, 'b-', label='Estimates', linewidth=2)
     
     plt.xlabel('Time Step')
     plt.ylabel('Position (m)')
-    plt.title('Position Estimation using Average')
+    plt.title('Position Estimation')
     plt.legend()
     plt.grid(True, alpha=0.3)
+    
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    
+    plt.show()
+
+
+def plot_kalman_gain(kalman_gains, save_path=None):
+    """
+    カルマンゲインの推移を表示
+    
+    Parameters
+    ----------
+    kalman_gains : list
+        カルマンゲインのリスト
+    save_path : str, optional
+        保存先のパス
+    """
+    steps = range(len(kalman_gains))
+    
+    plt.figure(figsize=(10, 5))
+    plt.plot(steps, kalman_gains, 'r-', linewidth=2, marker='o')
+    
+    plt.xlabel('Time Step')
+    plt.ylabel('Kalman Gain')
+    plt.title('Kalman Gain over Time')
+    plt.grid(True, alpha=0.3)
+    plt.ylim(0, 1)
     
     if save_path:
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
