@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class LinearKalmanFilter:
     """
     1次元線形カルマンフィルタ
