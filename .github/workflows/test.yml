@@ -43,7 +43,7 @@ jobs:
         
         for i in range(100):
             kf.predict(u=1.0)
-            x_est, K = kf.update(z=i + np.random.randn())
+            K = kf.update(z=i + np.random.randn())
             
             assert 0 <= K <= 1, f'Kalman gain out of range: {K}'
             assert kf.P >= 0, f'Uncertainty is negative: {kf.P}'
