@@ -120,4 +120,48 @@ def plot_kalman_gain(kalman_gains, save_path=None):
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
     
     plt.show()
+
+
+def plot_parameter_comparison(true_positions, observations, estimates_dict, save_path=None):
+    """
+    複数のパラメータ設定での推定結果を比較
+    
+    Parameters
+    ----------
+    true_positions : list
+        真の位置のリスト
+    observations : list
+        観測値のリスト
+    estimates_dict : dict
+        {ラベル: (推定値, エラー)} の辞書
+    save_path : str, optional
+        保存先のパス
+    """
+    steps = range(len(true_positions))
+    colors = ['b', 'm', 'c', 'orange', 'purple']
+    linestyles = ['-', '--', '-.', ':', '-']
+    
+    plt.figure(figsize=(12, 6))
+    plt.plot(steps, true_positions, 'g-', label='True Position', linewidth=2)
+    plt.plot(steps, observations, 'rx', label='Observations', markersize=8, alpha=0.5)
+    
+    for i, (label, (estimates, error)) in enumerate(estimates_dict.items()):
+        plt.plot(steps, estimates, 
+                color=colors[i % len(colors)],
+                linestyle=linestyles[i % len(linestyles)],
+                label=f'{label} (error={error:.3f})', 
+                linewidth=2)
+    
+    plt.xlabel('Time Step')
+    plt.ylabel('Position (m)')
+    plt.title('Effect of Q and R Parameters on Kalman Filter')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    
+    if save_path:
+        plt.savefig(save_path, dpi=150, bbox_inches='tight')
+    
+    plt.show()
+    
+    plt.show()
     

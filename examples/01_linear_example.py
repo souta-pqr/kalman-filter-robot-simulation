@@ -1,14 +1,13 @@
 import sys
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 
 # パスを追加
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from src.robot_simulator import Robot1D
 from src.linear_kf import LinearKalmanFilter
-from src.visualizer import plot_with_estimates
+from src.visualizer import plot_parameter_comparison
 
 
 def run_simulation(Q, R, robot, label):
@@ -58,7 +57,7 @@ def main():
     Q1 = process_noise**2
     R1 = observation_noise**2
     estimates1 = run_simulation(Q1, R1, robot, "正しいQ,R")
-    print(f"設定1: Q={Q1:.4f}, R={R1:.2f} (正しい値)")
+    print(f"設定1: Q={Q1:.4f}, R={R1:.2f}")
     errors1 = [abs(t - e) for t, e in zip(robot.position_history[1:], estimates1[1:])]
     print(f"  平均誤差: {np.mean(errors1):.3f}m\n")
     
@@ -66,7 +65,7 @@ def main():
     Q2 = 0.1
     R2 = observation_noise**2
     estimates2 = run_simulation(Q2, R2, robot, "大きいQ")
-    print(f"設定2: Q={Q2:.4f}, R={R2:.2f} (Qを大きく→観測を信じる)")
+    print(f"設定2: Q={Q2:.4f}, R={R2:.2f}")
     errors2 = [abs(t - e) for t, e in zip(robot.position_history[1:], estimates2[1:])]
     print(f"  平均誤差: {np.mean(errors2):.3f}m\n")
     
@@ -74,32 +73,23 @@ def main():
     Q3 = 0.001
     R3 = observation_noise**2
     estimates3 = run_simulation(Q3, R3, robot, "小さいQ")
-    print(f"設定3: Q={Q3:.4f}, R={R3:.2f} (Qを小さく→予測を信じる)")
+    print(f"設定3: Q={Q3:.4f}, R={R3:.2f}")
     errors3 = [abs(t - e) for t, e in zip(robot.position_history[1:], estimates3[1:])]
     print(f"  平均誤差: {np.mean(errors3):.3f}m\n")
     
     print("\n--- 結果 ---")
     print(f"設定1の誤差: {np.mean(errors1):.3f}m")
-    print(f"設定2の誤差: {np.mean(errors2):.3f}m (Q大→観測重視)")
-    print(f"設定3の誤差: {np.mean(errors3):.3f}m (Q小→予測重視)")
+    print(f"設定2の誤差: {np.mean(errors2):.3f}m")
+    print(f"設定3の誤差: {np.mean(errors3):.3f}m")
     
     # グラフ表示
     print("\nグラフを表示中...")
-    steps = range(len(robot.position_history))
-    
-    plt.figure(figsize=(12, 6))
-    plt.plot(steps, robot.position_history, 'g-', label='True Position', linewidth=2)
-    plt.plot(steps, robot.observation_history, 'rx', label='Observations', markersize=8, alpha=0.5)
-    plt.plot(steps, estimates1, 'b-', label=f'Correct Q,R (error={np.mean(errors1):.3f})', linewidth=2)
-    plt.plot(steps, estimates2, 'm--', label=f'Large Q (error={np.mean(errors2):.3f})', linewidth=2)
-    plt.plot(steps, estimates3, 'c-.', label=f'Small Q (error={np.mean(errors3):.3f})', linewidth=2)
-    
-    plt.xlabel('Time Step')
-    plt.ylabel('Position (m)')
-    plt.title('Effect of Q and R Parameters on Kalman Filter')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-    plt.show()
+    estimates_dict = {
+        'Correct Q,R': (estimates1, np.mean(errors1)),
+        'Large Q': (estimates2, np.mean(errors2)),
+        'Small Q': (estimates3, np.mean(errors3))
+    }
+    plot_parameter_comparison(robot.position_history, robot.observation_history, estimates_dict)
 
 
 if __name__ == "__main__":
