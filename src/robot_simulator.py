@@ -2,16 +2,19 @@ import numpy as np
 
 class Robot1D:
     
-    def __init__(self, initial_position=0.0, observation_noise_std=0.0):
+    def __init__(self, initial_position=0.0, process_noise_std=0.0, observation_noise_std=0.0):
         """
         Parameters
         ----------
         initial_position : float
             初期位置
+        process_noise_std : float
+            プロセスノイズの標準偏差
         observation_noise_std : float
             観測ノイズの標準偏差
         """
         self.position = initial_position
+        self.process_noise_std = process_noise_std
         self.observation_noise_std = observation_noise_std
         
     def move(self, distance):
@@ -26,7 +29,8 @@ class Robot1D:
         position : float
             移動後の位置
         """
-        self.position += distance
+        noise = np.random.randn() * self.process_noise_std
+        self.position += distance + noise
         return self.position
     
     def get_position(self):

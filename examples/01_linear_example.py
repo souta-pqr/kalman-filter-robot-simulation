@@ -15,17 +15,20 @@ def main():
     # 乱数シード
     np.random.seed(42)
     
-    # ロボットを作成
+    # ロボットを作成（プロセスノイズあり）
+    process_noise = 0.1
     observation_noise = 0.5
-    robot = Robot1D(initial_position=0.0, observation_noise_std=observation_noise)
+    robot = Robot1D(initial_position=0.0,
+                    process_noise_std=process_noise,
+                    observation_noise_std=observation_noise)
     
     # カルマンフィルタの初期化
-    Q = 0.01  # プロセスノイズ
+    Q = process_noise**2  # プロセスノイズの共分散
     R = observation_noise**2  # 観測ノイズの共分散
     kf = LinearKalmanFilter(Q=Q, R=R, x0=0.0, P0=1.0)
     
-    print(f"\n観測ノイズ R: {R:.2f}")
-    print(f"プロセスノイズ Q: {Q}")
+    print(f"\nプロセスノイズ Q: {Q:.4f}")
+    print(f"観測ノイズ R: {R:.2f}")
     print(f"初期位置: {robot.get_position():.1f}m")
     print(f"初期予測誤差 P: {kf.P}")
     
@@ -38,7 +41,7 @@ def main():
     # ロボットを10回動かす
     print("\n--- シミュレーション ---")
     for step in range(1, 11):
-        # 1m前進
+        # 1m前進（ノイズあり）
         true_pos = robot.move(distance=1.0)
         obs = robot.observe()
         
@@ -51,31 +54,28 @@ def main():
         estimates.append(estimate)
         kalman_gains.append(K)
         
-        print(f"ステップ {step}: 真値={true_pos:.1f}m, 観測={obs:.2f}m, "
-              f"推定={estimate:.2f}m, K={K:.3f}, P={kf.P:.4f}")
+        # 実際の移動量
+        actual_move = true_pos - true_positions[-2]
+        print(f"ステップ {step}: 真値={true_pos:.2f}m(移動{actual_move:.2f}m), "
+              f"観測={obs:.2f}m, 推定={estimate:.2f}m, K={K:.3f}")
     
     # 結果
     print("\n--- 結果 ---")
-    print(f"最終の真の位置: {robot.get_position():.1f}m")
+    print(f"最終の真の位置: {robot.get_position():.2f}m")
     print(f"最後の観測値: {observations[-1]:.2f}m")
     print(f"最後の推定値: {estimates[-1]:.2f}m")
     print(f"最終カルマンゲイン: {kalman_gains[-1]:.3f}")
     print(f"最終予測誤差: {kf.P:.4f}")
     
     # 誤差計算
-    obs_error = abs(observations[-1] - robot.get_position())
-    est_error = abs(estimates[-1] - robot.get_position())
-    print(f"\n観測値の誤差: {obs_error:.2f}m")
-    print(f"推定値の誤差: {est_error:.2f}m")
-    
-    if obs_error > 0:
-        print(f"改善率: {(1 - est_error/obs_error)*100:.1f}%")
+    errors = [abs(t - e) for t, e in zip(true_positions[1:], estimates[1:])]
+    mean_error = np.mean(errors)
+    print(f"\n平均推定誤差: {mean_error:.2f}m")
     
     # グラフ表示
     print("\nグラフを表示中...")
     plot_with_estimates(true_positions, observations, estimates)
     plot_kalman_gain(kalman_gains)
-    
 
 if __name__ == "__main__":
     main()
