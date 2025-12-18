@@ -145,6 +145,13 @@ def main():
                                   blit=True, repeat=True)
     
     plt.tight_layout()
+    
+    # GIFとして保存
+    output_path = 'kalman_filter_animation.gif'
+    try:
+        anim.save(output_path, writer='pillow', fps=2, dpi=100)
+    except Exception as e:
+        print(f"Failed to save animation: {e}")
 
     plt.show()
     
