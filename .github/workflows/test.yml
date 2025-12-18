@@ -30,3 +30,23 @@ jobs:
     - name: test example
       run: |
         MPLBACKEND=Agg python examples/01_linear_example.py
+    
+    - name: test kalman filter
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, 'src')
+        from linear_kf import LinearKalmanFilter
+        import numpy as np
+        
+        kf = LinearKalmanFilter(Q=0.01, R=0.25, x0=0.0, P0=1.0)
+        
+        for i in range(100):
+            kf.predict(u=1.0)
+            x_est, K = kf.update(z=i + np.random.randn())
+            
+            assert 0 <= K <= 1, f'Kalman gain out of range: {K}'
+            assert kf.P >= 0, f'Uncertainty is negative: {kf.P}'
+        
+        print('OK')
+        "
