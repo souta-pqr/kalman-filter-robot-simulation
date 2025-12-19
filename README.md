@@ -14,6 +14,24 @@
 
 ![Extended Kalman Filter Animation](assets/ekf_2d_animation.gif)
 
+## 動作確認済み環境
+
+- Ubuntu 22.04, 24.04
+- Python 3.9, 3.10, 3.11, 3.12, 3.13
+
+## 環境構築
+
+```bash
+# conda環境の作成
+conda create -n kalman python=3.11
+
+# 環境の有効化
+conda activate kalman
+
+# パッケージのインストール
+pip install -r requirements.txt
+```
+
 ## 実行方法
 
 ```bash
