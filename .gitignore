@@ -49,3 +49,5 @@ htmlcov/
 # Temporary files
 *.log
 *.tmp
+# Type checking
+.mypy_cache/
