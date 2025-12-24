@@ -77,3 +77,4 @@ python examples_2d/02_animation_example.py
 ## 参考文献
 
 - [上田先生が開講された確率ロボティクスの授業](https://github.com/ryuichiueda/slides_marp/tree/master/prob_robotics_2025)
+- [Liu Yang氏によるカルマンフィルタと拡張カルマンフィルタの実装例](https://qiita.com/scomup/items/a23938a9d9a17fafa3f2)
